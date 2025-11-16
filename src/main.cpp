@@ -6,7 +6,7 @@
 #include <limits>
 #include <algorithm>
 
-#include <parlay/parallel.h>   // нужно для рантайма parlay (env PARLAY_NUM_THREADS)
+#include <parlay/parallel.h>
 #include "quicksort_parlay.h"
 
 using Clock = std::chrono::high_resolution_clock;
@@ -20,14 +20,11 @@ struct Timer {
     }
 };
 
-// ---------------------- correctness tests ----------------------
-
 void test_with_vector(const std::vector<int>& base) {
     std::vector<int> a = base;
     std::vector<int> b = base;
     std::vector<int> ref = base;
 
-    // std::sort как эталон
     std::sort(ref.begin(), ref.end());
 
     qs_parlay::quicksort_seq(a.begin(), a.end());
@@ -40,7 +37,7 @@ void test_with_vector(const std::vector<int>& base) {
 }
 
 void run_correctness_tests() {
-    std::cout << "Running correctness tests...\n";
+    std::cout << "Running correctness tests\n";
 
     std::mt19937_64 gen(123456);
     std::uniform_int_distribution<int> dist(
@@ -54,16 +51,14 @@ void run_correctness_tests() {
         return v;
     };
 
-    // Небольшие и средние размеры
     std::vector<std::size_t> sizes = {0, 1, 2, 10, 100, 1000, 100000};
 
     for (std::size_t n : sizes) {
         auto v = make_random(n);
         test_with_vector(v);
-        std::cout << "  random n=" << n << " OK\n";
+        std::cout << "  random n = " << n << " OK\n";
     }
 
-    // Спец-случаи: уже отсортированный, обратно отсортированный, все равны
     {
         std::vector<int> sorted(100000);
         for (int i = 0; i < 100000; ++i) sorted[i] = i;
@@ -75,22 +70,21 @@ void run_correctness_tests() {
         std::vector<int> rev(100000);
         for (int i = 0; i < 100000; ++i) rev[i] = 100000 - i;
         test_with_vector(rev);
-        std::cout << "  reverse sorted OK\n";
+        std::cout << "    reverse sorted OK\n";
     }
 
     {
         std::vector<int> equal(100000, 42);
         test_with_vector(equal);
-        std::cout << "  all equal OK\n";
+        std::cout << "    all equal OK\n";
     }
 
-    std::cout << "All correctness tests passed.\n\n";
+    std::cout << "  Correctness tests passed.\n\n";
 }
 
-// ---------------------- benchmark ----------------------
 
 int main(int argc, char** argv) {
-    std::size_t n = 100000000; // 1e8 по условию
+    std::size_t n = 100000000;
     int rounds = 5;
 
     if (argc > 1) {
@@ -121,31 +115,29 @@ int main(int argc, char** argv) {
     double total_seq = 0.0;
     double total_par = 0.0;
 
-    std::cout << "Benchmarking on n=" << n << "...\n";
+    std::cout << "---Benchmarking on n = " << n << "---\n";
 
     for (int r = 0; r < rounds; ++r) {
         std::uint64_t seed_base = 1000 + r * 17;
 
-        std::cout << "Round " << (r + 1) << "/" << rounds << ":\n";
+        std::cout << "  Round " << (r + 1) << "from" << rounds << ":\n";
 
-        // ---- sequential ----
         {
             auto data = make_random(n, seed_base);
             Timer t;
             qs_parlay::quicksort_seq(data.begin(), data.end());
             double t_seq = t.elapsed();
             total_seq += t_seq;
-            std::cout << "  seq: " << t_seq << " s\n";
+            std::cout << "    seq: " << t_seq << " sec\n";
         }
 
-        // ---- parallel ----
         {
             auto data = make_random(n, seed_base + 123456789ull);
             Timer t;
             qs_parlay::quicksort_par(data.begin(), data.end());
             double t_par = t.elapsed();
             total_par += t_par;
-            std::cout << "  par: " << t_par << " s\n";
+            std::cout << "    par: " << t_par << " sec\n";
         }
 
         std::cout << std::endl;
@@ -155,11 +147,11 @@ int main(int argc, char** argv) {
     double avg_par = total_par / rounds;
     double speedup = avg_seq / avg_par;
 
-    std::cout << "==============================\n";
-    std::cout << "Average seq time: " << avg_seq << " s\n";
-    std::cout << "Average par time: " << avg_par << " s\n";
-    std::cout << "Speedup (seq / par): " << speedup << "x\n";
-    std::cout << "==============================\n";
+    std::cout << "-----------------------\n";
+    std::cout << "Avg seq time: " << avg_seq << " s\n";
+    std::cout << "Avg par time: " << avg_par << " s\n";
+    std::cout << "Speedup: " << speedup << "x\n";
+    std::cout << "-----------------------\n";
 
     return 0;
 }
