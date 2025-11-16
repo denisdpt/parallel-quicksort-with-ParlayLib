@@ -1,0 +1,3 @@
+/mnt/c/Users/Denis/vs-code/big_hw1_paral/build/CMakeFiles/quicksort_bench.dir
+/mnt/c/Users/Denis/vs-code/big_hw1_paral/build/CMakeFiles/edit_cache.dir
+/mnt/c/Users/Denis/vs-code/big_hw1_paral/build/CMakeFiles/rebuild_cache.dir
