@@ -52,3 +52,63 @@ Avg seq time: 7.85952 s
 Avg par time: 2.53236 s
 Speedup: 3.10363x
 -----------------------
+
+
+
+
+
+
+
+
+denis@denis-MS-7C52:~/Downloads/parallel-quicksort-with-ParlayLib-main_with_tests_autoparlay/parallel-quicksort-with-ParlayLib-main$ ctest --test-dir build --output-on-failure
+Internal ctest changing into directory: /home/denis/Downloads/parallel-quicksort-with-ParlayLib-main_with_tests_autoparlay/parallel-quicksort-with-ParlayLib-main/build
+Test project /home/denis/Downloads/parallel-quicksort-with-ParlayLib-main_with_tests_autoparlay/parallel-quicksort-with-ParlayLib-main/build
+    Start 1: quicksort_tests
+1/1 Test #1: quicksort_tests ..................   Passed    0.09 sec
+
+100% tests passed, 0 tests failed out of 1
+
+Total Test time (real) =   0.10 sec
+denis@denis-MS-7C52:~/Downloads/parallel-quicksort-with-ParlayLib-main_with_tests_autoparlay/parallel-quicksort-with-ParlayLib-main$ PARLAY_NUM_THREADS=4 ./build/quicksort_bench 100000000 5
+parallel-quicksort with ParlayLib
+n = 100000000, rounds = 5
+
+Running correctness tests
+  random n = 0 OK
+  random n = 1 OK
+  random n = 2 OK
+  random n = 10 OK
+  random n = 100 OK
+  random n = 1000 OK
+  random n = 100000 OK
+  already sorted OK
+    reverse sorted OK
+    all equal OK
+  Correctness tests passed.
+
+---Benchmarking on n = 100000000---
+  Round 1from5:
+    seq: 8.17186 sec
+    par: 2.32992 sec
+
+  Round 2from5:
+    seq: 8.48249 sec
+    par: 2.5346 sec
+
+  Round 3from5:
+    seq: 8.46647 sec
+    par: 2.32917 sec
+
+  Round 4from5:
+    seq: 8.18589 sec
+    par: 2.22109 sec
+
+  Round 5from5:
+    seq: 8.30756 sec
+    par: 2.23668 sec
+
+-----------------------
+Avg seq time: 8.32285 s
+Avg par time: 2.33029 s
+Speedup: 3.57159x
+-----------------------
